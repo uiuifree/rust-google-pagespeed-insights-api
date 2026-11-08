@@ -14,6 +14,10 @@ pub use response::{
 };
 pub use summary::{FieldSummary, FieldValue, LabSummary};
 
+/// Re-export of `reqwest`, for building a client to pass to
+/// [`PageSpeedInsightsApi::with_client`] without adding the dependency yourself.
+pub use reqwest;
+
 use reqwest::Url;
 use serde::de::DeserializeOwned;
 use serde_json::Value;

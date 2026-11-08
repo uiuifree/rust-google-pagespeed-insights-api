@@ -16,3 +16,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Typed response: Lighthouse categories, audits and run metadata, and Chrome UX Report
   field data for the URL and its origin.
 - `FieldSummary`, `LabSummary` and `LighthouseResult::failing_audits`.
+- Re-export of `reqwest` for `with_client`.
+- Live tests against the real API (`tests/live.rs`, ignored by default) and a weekly CI run.
