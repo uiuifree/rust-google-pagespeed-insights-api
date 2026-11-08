@@ -1,0 +1,270 @@
+{
+  "captchaResult": "CAPTCHA_NOT_NEEDED",
+  "kind": "pagespeedonline#result",
+  "id": "https://example.com/",
+  "loadingExperience": {
+    "id": "https://example.com/",
+    "metrics": {
+      "CUMULATIVE_LAYOUT_SHIFT_SCORE": {
+        "percentile": 12,
+        "distributions": [
+          { "min": 0, "max": 10, "proportion": 0.71 },
+          { "min": 10, "max": 25, "proportion": 0.2 },
+          { "min": 25, "proportion": 0.09 }
+        ],
+        "category": "AVERAGE"
+      },
+      "EXPERIMENTAL_TIME_TO_FIRST_BYTE": {
+        "percentile": 820,
+        "distributions": [
+          { "min": 0, "max": 800, "proportion": 0.74 },
+          { "min": 800, "max": 1800, "proportion": 0.21 },
+          { "min": 1800, "proportion": 0.05 }
+        ],
+        "category": "AVERAGE"
+      },
+      "FIRST_CONTENTFUL_PAINT_MS": {
+        "percentile": 1600,
+        "distributions": [
+          { "min": 0, "max": 1800, "proportion": 0.8 },
+          { "min": 1800, "max": 3000, "proportion": 0.14 },
+          { "min": 3000, "proportion": 0.06 }
+        ],
+        "category": "FAST"
+      },
+      "INTERACTION_TO_NEXT_PAINT": {
+        "percentile": 180,
+        "distributions": [
+          { "min": 0, "max": 200, "proportion": 0.78 },
+          { "min": 200, "max": 500, "proportion": 0.17 },
+          { "min": 500, "proportion": 0.05 }
+        ],
+        "category": "FAST"
+      },
+      "LARGEST_CONTENTFUL_PAINT_MS": {
+        "percentile": 2300,
+        "distributions": [
+          { "min": 0, "max": 2500, "proportion": 0.79 },
+          { "min": 2500, "max": 4000, "proportion": 0.14 },
+          { "min": 4000, "proportion": 0.07 }
+        ],
+        "category": "FAST"
+      }
+    },
+    "overall_category": "AVERAGE",
+    "initial_url": "https://example.com/"
+  },
+  "originLoadingExperience": {
+    "id": "https://example.com",
+    "metrics": {
+      "LARGEST_CONTENTFUL_PAINT_MS": {
+        "percentile": 2600,
+        "distributions": [
+          { "min": 0, "max": 2500, "proportion": 0.73 },
+          { "min": 2500, "max": 4000, "proportion": 0.18 },
+          { "min": 4000, "proportion": 0.09 }
+        ],
+        "category": "AVERAGE"
+      }
+    },
+    "overall_category": "AVERAGE",
+    "initial_url": "https://example.com/"
+  },
+  "lighthouseResult": {
+    "requestedUrl": "https://example.com/",
+    "finalUrl": "https://example.com/",
+    "mainDocumentUrl": "https://example.com/",
+    "finalDisplayedUrl": "https://example.com/",
+    "lighthouseVersion": "12.6.0",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/137.0.0.0 Safari/537.36",
+    "fetchTime": "2026-11-08T02:30:00.000Z",
+    "environment": {
+      "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36 Chrome-Lighthouse",
+      "hostUserAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/137.0.0.0 Safari/537.36",
+      "benchmarkIndex": 2100
+    },
+    "runWarnings": [],
+    "configSettings": {
+      "emulatedFormFactor": "mobile",
+      "formFactor": "mobile",
+      "locale": "ja",
+      "onlyCategories": ["performance", "seo"],
+      "channel": "lr"
+    },
+    "audits": {
+      "first-contentful-paint": {
+        "id": "first-contentful-paint",
+        "title": "First Contentful Paint",
+        "description": "First Contentful Paint marks the time at which the first text or image is painted.",
+        "score": 0.86,
+        "scoreDisplayMode": "numeric",
+        "displayValue": "1.9 s",
+        "numericValue": 1912.5,
+        "numericUnit": "millisecond"
+      },
+      "largest-contentful-paint": {
+        "id": "largest-contentful-paint",
+        "title": "Largest Contentful Paint",
+        "description": "Largest Contentful Paint marks the time at which the largest text or image is painted.",
+        "score": 0.62,
+        "scoreDisplayMode": "numeric",
+        "displayValue": "3.4 s",
+        "numericValue": 3420.1,
+        "numericUnit": "millisecond"
+      },
+      "total-blocking-time": {
+        "id": "total-blocking-time",
+        "title": "Total Blocking Time",
+        "description": "Sum of all time periods between FCP and Time to Interactive.",
+        "score": 0.95,
+        "scoreDisplayMode": "numeric",
+        "displayValue": "120 ms",
+        "numericValue": 120,
+        "numericUnit": "millisecond"
+      },
+      "cumulative-layout-shift": {
+        "id": "cumulative-layout-shift",
+        "title": "Cumulative Layout Shift",
+        "description": "Cumulative Layout Shift measures the movement of visible elements within the viewport.",
+        "score": 1,
+        "scoreDisplayMode": "numeric",
+        "displayValue": "0.02",
+        "numericValue": 0.0213,
+        "numericUnit": "unitless",
+        "details": { "type": "debugdata", "items": [{ "cumulativeLayoutShiftMainFrame": 0.0213 }] }
+      },
+      "speed-index": {
+        "id": "speed-index",
+        "title": "Speed Index",
+        "description": "Speed Index shows how quickly the contents of a page are visibly populated.",
+        "score": 0.91,
+        "scoreDisplayMode": "numeric",
+        "displayValue": "3.0 s",
+        "numericValue": 3010,
+        "numericUnit": "millisecond"
+      },
+      "server-response-time": {
+        "id": "server-response-time",
+        "title": "Initial server response time was short",
+        "description": "Keep the server response time for the main document short.",
+        "score": 1,
+        "scoreDisplayMode": "metricSavings",
+        "displayValue": "Root document took 210 ms",
+        "numericValue": 210,
+        "numericUnit": "millisecond",
+        "metricSavings": { "FCP": 0, "LCP": 0 }
+      },
+      "render-blocking-resources": {
+        "id": "render-blocking-resources",
+        "title": "Eliminate render-blocking resources",
+        "description": "Resources are blocking the first paint of your page.",
+        "score": 0.5,
+        "scoreDisplayMode": "metricSavings",
+        "displayValue": "Potential savings of 450 ms",
+        "numericValue": 450,
+        "numericUnit": "millisecond",
+        "metricSavings": { "FCP": 450, "LCP": 450 },
+        "details": {
+          "type": "opportunity",
+          "headings": [],
+          "items": [{ "url": "https://example.com/style.css", "totalBytes": 18240, "wastedMs": 450 }],
+          "overallSavingsMs": 450
+        }
+      },
+      "mainthread-work-breakdown": {
+        "id": "mainthread-work-breakdown",
+        "title": "Minimizes main-thread work",
+        "description": "Consider reducing the time spent parsing, compiling and executing JS.",
+        "score": null,
+        "scoreDisplayMode": "informative",
+        "displayValue": "1.2 s",
+        "numericValue": 1210,
+        "numericUnit": "millisecond"
+      },
+      "document-title": {
+        "id": "document-title",
+        "title": "Document has a `<title>` element",
+        "description": "The title gives screen reader users an overview of the page.",
+        "score": 1,
+        "scoreDisplayMode": "binary"
+      },
+      "meta-description": {
+        "id": "meta-description",
+        "title": "Document does not have a meta description",
+        "description": "Meta descriptions may be included in search results to concisely summarize page content.",
+        "score": 0,
+        "scoreDisplayMode": "binary"
+      },
+      "is-crawlable": {
+        "id": "is-crawlable",
+        "title": "Page isn't blocked from indexing",
+        "description": "Search engines are unable to include your pages in search results if they don't have permission to crawl them.",
+        "score": 1,
+        "scoreDisplayMode": "binary"
+      },
+      "hreflang": {
+        "id": "hreflang",
+        "title": "Document has a valid `hreflang`",
+        "description": "hreflang links tell search engines what version of a page they should list in search results.",
+        "score": null,
+        "scoreDisplayMode": "notApplicable"
+      },
+      "structured-data": {
+        "id": "structured-data",
+        "title": "Structured data is valid",
+        "description": "Run the Structured Data Testing Tool and the Structured Data Linter to validate structured data.",
+        "score": null,
+        "scoreDisplayMode": "manual"
+      },
+      "some-future-audit": {
+        "id": "some-future-audit",
+        "title": "An audit added in a future Lighthouse version",
+        "score": 0.3,
+        "scoreDisplayMode": "somethingNew"
+      }
+    },
+    "categories": {
+      "performance": {
+        "id": "performance",
+        "title": "Performance",
+        "score": 0.78,
+        "auditRefs": [
+          { "id": "first-contentful-paint", "weight": 10, "group": "metrics", "acronym": "FCP" },
+          { "id": "largest-contentful-paint", "weight": 25, "group": "metrics", "acronym": "LCP" },
+          { "id": "total-blocking-time", "weight": 30, "group": "metrics", "acronym": "TBT" },
+          { "id": "cumulative-layout-shift", "weight": 25, "group": "metrics", "acronym": "CLS" },
+          { "id": "speed-index", "weight": 10, "group": "metrics", "acronym": "SI" },
+          { "id": "server-response-time", "weight": 0, "group": "diagnostics" },
+          { "id": "render-blocking-resources", "weight": 0, "group": "diagnostics" },
+          { "id": "mainthread-work-breakdown", "weight": 0, "group": "diagnostics" }
+        ]
+      },
+      "seo": {
+        "id": "seo",
+        "title": "SEO",
+        "description": "These checks ensure that your page is following basic search engine optimization advice.",
+        "score": 0.9,
+        "manualDescription": "Run these additional validators on your site to check additional SEO best practices.",
+        "auditRefs": [
+          { "id": "is-crawlable", "weight": 4.043478260869565, "group": "seo-crawl" },
+          { "id": "document-title", "weight": 1, "group": "seo-content" },
+          { "id": "meta-description", "weight": 1, "group": "seo-content" },
+          { "id": "hreflang", "weight": 1, "group": "seo-content" },
+          { "id": "structured-data", "weight": 0 }
+        ]
+      }
+    },
+    "categoryGroups": {
+      "metrics": { "title": "Metrics" },
+      "diagnostics": { "title": "Diagnostics", "description": "More information about the performance of your application." },
+      "seo-crawl": { "title": "Crawling and Indexing" },
+      "seo-content": { "title": "Content Best Practices" }
+    },
+    "timing": { "total": 14321.7 },
+    "i18n": { "rendererFormattedStrings": {} },
+    "stackPacks": [],
+    "entities": [{ "name": "example.com", "isFirstParty": true, "origins": ["https://example.com"] }]
+  },
+  "analysisUTCTimestamp": "2026-11-08T02:30:00.000Z",
+  "version": { "major": 1, "minor": 15 }
+}

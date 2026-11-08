@@ -1,0 +1,179 @@
+use google_pagespeed_insights_api::{
+    Category, FieldCategory, GoogleApiError, PageSpeedInsightsApi, RunPagespeedRequest,
+    ScoreDisplayMode, Strategy,
+};
+use httpmock::prelude::*;
+
+const FIXTURE: &str = include_str!("fixtures/run_pagespeed_mobile.json");
+
+fn request() -> RunPagespeedRequest {
+    RunPagespeedRequest::new("https://example.com/")
+        .categories([Category::Performance, Category::Seo])
+        .locale("ja")
+}
+
+#[tokio::test]
+async fn parses_full_response() {
+    let server = MockServer::start_async().await;
+    let mock = server
+        .mock_async(|when, then| {
+            when.method(GET)
+                .path("/runPagespeed")
+                .query_param("url", "https://example.com/")
+                .query_param("strategy", "MOBILE")
+                .query_param("category", "PERFORMANCE")
+                .query_param("category", "SEO")
+                .query_param("locale", "ja")
+                .query_param("key", "test-key");
+            then.status(200)
+                .header("content-type", "application/json")
+                .body(FIXTURE);
+        })
+        .await;
+
+    let api = PageSpeedInsightsApi::with_api_key("test-key").with_base_url(server.base_url());
+    let response = api.run_pagespeed(&request()).await.unwrap();
+    mock.assert_async().await;
+
+    assert_eq!(response.id, "https://example.com/");
+    assert_eq!(response.category_score(Category::Performance), Some(0.78));
+    assert_eq!(response.category_score(Category::Seo), Some(0.9));
+    assert_eq!(response.category_score(Category::Accessibility), None);
+
+    let lighthouse = response.lighthouse_result.as_ref().unwrap();
+    assert_eq!(lighthouse.lighthouse_version.as_deref(), Some("12.6.0"));
+    assert_eq!(
+        lighthouse.audit("hreflang").unwrap().score_display_mode,
+        Some(ScoreDisplayMode::NotApplicable)
+    );
+    assert_eq!(
+        lighthouse
+            .audit("some-future-audit")
+            .unwrap()
+            .score_display_mode,
+        Some(ScoreDisplayMode::Unknown)
+    );
+
+    let failing: Vec<&str> = lighthouse
+        .failing_audits(Category::Performance)
+        .iter()
+        .map(|a| a.id.as_str())
+        .collect();
+    assert_eq!(
+        failing,
+        [
+            "first-contentful-paint",
+            "largest-contentful-paint",
+            "render-blocking-resources"
+        ]
+    );
+    let failing: Vec<&str> = lighthouse
+        .failing_audits(Category::Seo)
+        .iter()
+        .map(|a| a.id.as_str())
+        .collect();
+    assert_eq!(failing, ["meta-description"]);
+}
+
+#[tokio::test]
+async fn summaries() {
+    let response: google_pagespeed_insights_api::PagespeedResponse =
+        serde_json::from_str(FIXTURE).unwrap();
+
+    let page = response.page_field_summary().unwrap();
+    assert_eq!(page.overall, Some(FieldCategory::Average));
+    assert!(!page.origin_fallback);
+    assert_eq!(page.lcp.unwrap().p75, 2300.0);
+    assert_eq!(page.inp.unwrap().p75, 180.0);
+    assert_eq!(page.cls.unwrap().p75, 0.12);
+    assert_eq!(page.cls.unwrap().category, Some(FieldCategory::Average));
+    assert_eq!(page.ttfb.unwrap().p75, 820.0);
+
+    let origin = response.origin_field_summary().unwrap();
+    assert_eq!(origin.id.as_deref(), Some("https://example.com"));
+    assert!(origin.inp.is_none());
+
+    let lab = response.lab_summary().unwrap();
+    assert_eq!(lab.performance_score, Some(0.78));
+    assert_eq!(lab.lcp, Some(3420.1));
+    assert_eq!(lab.tbt, Some(120.0));
+    assert_eq!(lab.cls, Some(0.0213));
+    assert_eq!(lab.server_response_time, Some(210.0));
+}
+
+#[tokio::test]
+async fn sends_bearer_token() {
+    let server = MockServer::start_async().await;
+    let mock = server
+        .mock_async(|when, then| {
+            when.method(GET)
+                .path("/runPagespeed")
+                .query_param("strategy", "DESKTOP")
+                .header("authorization", "Bearer token-1");
+            then.status(200)
+                .body(r#"{"kind":"pagespeedonline#result","id":"https://example.com/"}"#);
+        })
+        .await;
+
+    let api = PageSpeedInsightsApi::with_access_token("token-1").with_base_url(server.base_url());
+    let response = api
+        .run_pagespeed(
+            &RunPagespeedRequest::new("https://example.com/").strategy(Strategy::Desktop),
+        )
+        .await
+        .unwrap();
+    mock.assert_async().await;
+    assert!(response.lighthouse_result.is_none());
+    assert!(response.page_field_summary().is_none());
+}
+
+#[tokio::test]
+async fn http_error_keeps_status_and_body() {
+    let server = MockServer::start_async().await;
+    server
+        .mock_async(|when, then| {
+            when.method(GET).path("/runPagespeed");
+            then.status(400).body(
+                r#"{"error":{"code":400,"message":"Lighthouse returned error: FAILED_DOCUMENT_REQUEST.","status":"INVALID_ARGUMENT"}}"#,
+            );
+        })
+        .await;
+
+    let api = PageSpeedInsightsApi::new().with_base_url(server.base_url());
+    let error = api.run_pagespeed(&request()).await.unwrap_err();
+    assert_eq!(error.status(), Some(400));
+    match error {
+        GoogleApiError::HttpStatus(_, body) => assert!(body.contains("FAILED_DOCUMENT_REQUEST")),
+        other => panic!("unexpected error: {other}"),
+    }
+}
+
+#[tokio::test]
+async fn raw_returns_untyped_json() {
+    let server = MockServer::start_async().await;
+    server
+        .mock_async(|when, then| {
+            when.method(GET).path("/runPagespeed");
+            then.status(200).body(FIXTURE);
+        })
+        .await;
+
+    let api = PageSpeedInsightsApi::new().with_base_url(server.base_url());
+    let value = api.run_pagespeed_raw(&request()).await.unwrap();
+    assert_eq!(value["version"]["minor"], 15);
+}
+
+#[tokio::test]
+async fn invalid_json_is_json_parse_error() {
+    let server = MockServer::start_async().await;
+    server
+        .mock_async(|when, then| {
+            when.method(GET).path("/runPagespeed");
+            then.status(200).body("<html>");
+        })
+        .await;
+
+    let api = PageSpeedInsightsApi::new().with_base_url(server.base_url());
+    let error = api.run_pagespeed(&request()).await.unwrap_err();
+    assert!(matches!(error, GoogleApiError::JsonParse(_)));
+}

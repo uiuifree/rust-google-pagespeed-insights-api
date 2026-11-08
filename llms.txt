@@ -1,0 +1,16 @@
+# google-pagespeed-insights-api
+
+> Async Rust client for the Google PageSpeed Insights API v5. Returns Lighthouse scores and audits (lab data) and Chrome UX Report Core Web Vitals (field data, p75 of LCP, INP, CLS, FCP, TTFB) for a URL and its origin.
+
+Crate name: `google-pagespeed-insights-api`. Public items: `PageSpeedInsightsApi::{new, with_api_key, with_access_token, with_client, with_base_url, run_pagespeed, run_pagespeed_raw}`; `RunPagespeedRequest` builder with `strategy`, `category`, `categories`, `locale`; `Strategy::{Mobile, Desktop}`; `Category::{Performance, Accessibility, BestPractices, Seo, ALL}`; `PagespeedResponse` with `category_score`, `page_field_summary`, `origin_field_summary`, `lab_summary`; `LighthouseResult::{audit, category, failing_audits}`; `FieldSummary`, `LabSummary`; `GoogleApiError::{Connection, JsonParse, HttpStatus, InvalidArgument}`. Field CLS in `FieldSummary` is already divided by 100.
+
+## Documentation
+
+- [README](https://github.com/uiuifree/rust-google-pagespeed-insights-api/blob/main/README.md)
+- [API reference on docs.rs](https://docs.rs/google-pagespeed-insights-api)
+- [examples/run.rs](https://github.com/uiuifree/rust-google-pagespeed-insights-api/blob/main/examples/run.rs)
+
+## Upstream
+
+- [PageSpeed Insights API v5](https://developers.google.com/speed/docs/insights/v5/get-started)
+- [runPagespeed reference](https://developers.google.com/speed/docs/insights/rest/v5/pagespeedapi/runpagespeed)
