@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `with_quota_project` sends `x-goog-user-project`, needed with user credentials from the gcloud CLI.
+
 ## [0.1.0]
 
 ### Added

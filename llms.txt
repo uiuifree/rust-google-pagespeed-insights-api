@@ -6,7 +6,7 @@ Crate name: `google-pagespeed-insights-api` (import as `google_pagespeed_insight
 
 Public items:
 
-- `PageSpeedInsightsApi::{new, with_api_key, with_access_token, with_client, with_base_url}`; `run_pagespeed(&RunPagespeedRequest) -> Result<PagespeedResponse, GoogleApiError>`; `run_pagespeed_raw(..) -> Result<serde_json::Value, _>`
+- `PageSpeedInsightsApi::{new, with_api_key, with_access_token, with_quota_project, with_client, with_base_url}`; `run_pagespeed(&RunPagespeedRequest) -> Result<PagespeedResponse, GoogleApiError>`; `run_pagespeed_raw(..) -> Result<serde_json::Value, _>`
 - `RunPagespeedRequest::new(url)` with `.strategy(Strategy::{Mobile, Desktop})`, `.category(..)`, `.categories(Category::ALL)`, `.locale("en")`, `.utm_campaign(..)`, `.utm_source(..)`
 - `Category::{Performance, Accessibility, BestPractices, Seo}`; `Category::ALL`; `lighthouse_id()` gives `performance`, `best-practices`, ...
 - `PagespeedResponse::{category_score, page_field_summary, origin_field_summary, lab_summary}`; fields `id`, `loading_experience`, `origin_loading_experience`, `lighthouse_result`

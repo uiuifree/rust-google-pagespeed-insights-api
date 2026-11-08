@@ -59,6 +59,7 @@ pub struct PageSpeedInsightsApi {
     credential: Credential,
     base_url: String,
     client: reqwest::Client,
+    quota_project: Option<String>,
 }
 
 impl Default for PageSpeedInsightsApi {
@@ -74,6 +75,7 @@ impl PageSpeedInsightsApi {
             credential: Credential::None,
             base_url: DEFAULT_BASE_URL.to_string(),
             client: reqwest::Client::new(),
+            quota_project: None,
         }
     }
 
@@ -86,12 +88,35 @@ impl PageSpeedInsightsApi {
     }
 
     /// Client that sends an OAuth 2.0 access token in the `Authorization` header.
-    /// The quota of the token's Google Cloud project is used.
+    ///
+    /// A service account token uses the quota of its own project. A user token
+    /// (for example from `gcloud auth print-access-token`) usually needs
+    /// [`with_quota_project`](Self::with_quota_project) as well.
     pub fn with_access_token<T: Into<String>>(token: T) -> Self {
         PageSpeedInsightsApi {
             credential: Credential::AccessToken(token.into()),
             ..Self::new()
         }
+    }
+
+    /// Sends `x-goog-user-project`, which tells Google which project's quota and
+    /// billing to use. Needed with user credentials such as those from
+    /// `gcloud auth login` or `gcloud auth application-default login`, because
+    /// their OAuth client belongs to Google, not to your project. The project must
+    /// have the PageSpeed Insights API enabled, and the user needs the
+    /// `serviceusage.services.use` permission on it.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use google_pagespeed_insights_api::PageSpeedInsightsApi;
+    ///
+    /// let api = PageSpeedInsightsApi::with_access_token("ya29....").with_quota_project("my-project");
+    /// ```
+    pub fn with_quota_project<T: Into<String>>(mut self, project: T) -> Self {
+        let project = project.into();
+        self.quota_project = (!project.trim().is_empty()).then_some(project);
+        self
     }
 
     /// Uses the given HTTP client, for example one with a timeout or a proxy.
@@ -165,6 +190,9 @@ impl PageSpeedInsightsApi {
             .header(reqwest::header::ACCEPT, "application/json");
         if let Credential::AccessToken(token) = &self.credential {
             builder = builder.bearer_auth(token);
+        }
+        if let Some(project) = &self.quota_project {
+            builder = builder.header("x-goog-user-project", project);
         }
         let response = builder
             .send()

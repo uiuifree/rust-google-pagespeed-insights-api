@@ -177,3 +177,24 @@ async fn invalid_json_is_json_parse_error() {
     let error = api.run_pagespeed(&request()).await.unwrap_err();
     assert!(matches!(error, GoogleApiError::JsonParse(_)));
 }
+
+#[tokio::test]
+async fn sends_quota_project() {
+    let server = MockServer::start_async().await;
+    let mock = server
+        .mock_async(|when, then| {
+            when.method(GET)
+                .path("/runPagespeed")
+                .header("authorization", "Bearer user-token")
+                .header("x-goog-user-project", "my-project");
+            then.status(200).body(r#"{"id":"https://example.com/"}"#);
+        })
+        .await;
+    let api = PageSpeedInsightsApi::with_access_token("user-token")
+        .with_quota_project("my-project")
+        .with_base_url(server.base_url());
+    api.run_pagespeed(&RunPagespeedRequest::new("https://example.com/"))
+        .await
+        .unwrap();
+    mock.assert_async().await;
+}

@@ -98,6 +98,20 @@ and returns `429`. For regular use:
 3. Create an API key under *APIs & Services → Credentials*. Restricting it to the PageSpeed
    Insights API is recommended.
 
+An OAuth 2.0 access token works too (`PageSpeedInsightsApi::with_access_token`). With user
+credentials from the gcloud CLI, also set the project whose quota is used; without it Google
+answers `403`, because the token's OAuth client belongs to Google, not to your project:
+
+```rust,no_run
+# use google_pagespeed_insights_api::PageSpeedInsightsApi;
+# let token = String::new();
+// token from `gcloud auth print-access-token`
+let api = PageSpeedInsightsApi::with_access_token(token).with_quota_project("my-project");
+```
+
+The project needs the PageSpeed Insights API enabled. Service account tokens do not need
+`with_quota_project`.
+
 ## Installation
 
 ```toml
