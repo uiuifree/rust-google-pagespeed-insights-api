@@ -8,7 +8,7 @@
 //! ```
 
 use google_pagespeed_insights_api::{
-    reqwest, Category, GoogleApiError, PageSpeedInsightsApi, RunPagespeedRequest, Strategy,
+    Category, GoogleApiError, PageSpeedInsightsApi, RunPagespeedRequest, Strategy, reqwest,
 };
 use std::time::Duration;
 
