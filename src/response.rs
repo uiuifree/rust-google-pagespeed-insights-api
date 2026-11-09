@@ -13,6 +13,7 @@ use std::collections::BTreeMap;
 /// Response of `pagespeedapi.runpagespeed`.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct PagespeedResponse {
     /// Always `pagespeedonline#result`.
     #[serde(default)]
@@ -54,6 +55,7 @@ impl PagespeedResponse {
 ///
 /// Unlike the rest of the response, this object uses snake_case keys on the wire.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct LoadingExperience {
     /// The URL or origin the data belongs to.
     pub id: Option<String>,
@@ -83,6 +85,7 @@ impl LoadingExperience {
 
 /// Known metric names in [`LoadingExperience::metrics`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum FieldMetricName {
     /// `LARGEST_CONTENTFUL_PAINT_MS` (milliseconds). Core Web Vital.
     LargestContentfulPaint,
@@ -121,6 +124,7 @@ impl FieldMetricName {
 
 /// One CrUX metric.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct FieldMetric {
     /// 75th percentile value. Milliseconds, except CLS which is the score × 100.
     pub percentile: Option<f64>,
@@ -129,10 +133,19 @@ pub struct FieldMetric {
     pub distributions: Vec<FieldDistribution>,
     /// Assessment of the 75th percentile.
     pub category: Option<FieldCategory>,
+    /// Median value.
+    pub median: Option<f64>,
+    /// Identifier of the metric.
+    #[serde(rename = "metricId", alias = "metric_id")]
+    pub metric_id: Option<String>,
+    /// Device class of the data.
+    #[serde(rename = "formFactor", alias = "form_factor")]
+    pub form_factor: Option<String>,
 }
 
 /// One bucket of a [`FieldMetric`] histogram.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct FieldDistribution {
     /// Lower bound (inclusive).
     pub min: Option<f64>,
@@ -144,6 +157,7 @@ pub struct FieldDistribution {
 
 /// Assessment of field data.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[non_exhaustive]
 pub enum FieldCategory {
     /// Good.
     #[serde(rename = "FAST")]
@@ -165,6 +179,7 @@ pub enum FieldCategory {
 /// Lighthouse lab result.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct LighthouseResult {
     /// The URL that was requested.
     pub requested_url: Option<String>,
@@ -218,6 +233,8 @@ impl LighthouseResult {
             Category::Accessibility => self.categories.accessibility.as_ref(),
             Category::BestPractices => self.categories.best_practices.as_ref(),
             Category::Seo => self.categories.seo.as_ref(),
+            Category::Pwa => self.categories.pwa.as_ref(),
+            Category::AgenticBrowsing => self.categories.agentic_browsing.as_ref(),
         }
     }
 
@@ -253,6 +270,7 @@ impl LighthouseResult {
 /// Settings Lighthouse ran with.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct ConfigSettings {
     /// `mobile` or `desktop`.
     pub form_factor: Option<String>,
@@ -266,6 +284,7 @@ pub struct ConfigSettings {
 
 /// Why Lighthouse could not analyze the page.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct RuntimeError {
     /// Error code, such as `NO_FCP` or `ERRORED_DOCUMENT_REQUEST`.
     pub code: Option<String>,
@@ -275,6 +294,7 @@ pub struct RuntimeError {
 
 /// Timing of the run.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct Timing {
     /// Total time in milliseconds.
     pub total: Option<f64>,
@@ -282,6 +302,7 @@ pub struct Timing {
 
 /// The categories of a run. Only requested categories are present.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct Categories {
     /// Performance.
     pub performance: Option<LighthouseCategory>,
@@ -292,11 +313,17 @@ pub struct Categories {
     pub best_practices: Option<LighthouseCategory>,
     /// SEO.
     pub seo: Option<LighthouseCategory>,
+    /// Progressive Web App.
+    pub pwa: Option<LighthouseCategory>,
+    /// Agentic browsing.
+    #[serde(rename = "agentic-browsing")]
+    pub agentic_browsing: Option<LighthouseCategory>,
 }
 
 /// One Lighthouse category.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct LighthouseCategory {
     /// Category id, such as `performance` or `best-practices`.
     #[serde(default)]
@@ -307,6 +334,8 @@ pub struct LighthouseCategory {
     pub description: Option<String>,
     /// Score from `0.0` to `1.0`. `None` when it could not be computed.
     pub score: Option<f64>,
+    /// How the score is meant to be displayed: `GAUGE` or `FRACTION`.
+    pub category_score_display_mode: Option<String>,
     /// Description of the audits that must be checked by hand.
     pub manual_description: Option<String>,
     /// Audits that make up the category.
@@ -317,6 +346,7 @@ pub struct LighthouseCategory {
 /// Reference from a category to an audit.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct AuditRef {
     /// Audit id, a key of [`LighthouseResult::audits`].
     #[serde(default)]
@@ -334,6 +364,7 @@ pub struct AuditRef {
 /// A group of audits inside a category.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct CategoryGroup {
     /// Localized title.
     pub title: Option<String>,
@@ -344,6 +375,7 @@ pub struct CategoryGroup {
 /// One Lighthouse audit.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct LighthouseAudit {
     /// Audit id.
     #[serde(default)]
@@ -391,6 +423,7 @@ impl LighthouseAudit {
 /// How to read [`LighthouseAudit::score`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub enum ScoreDisplayMode {
     /// Pass (`1`) or fail (`0`).
     Binary,

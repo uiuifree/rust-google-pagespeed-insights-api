@@ -10,7 +10,7 @@
 [PageSpeed Insights API v5](https://developers.google.com/speed/docs/insights/v5/get-started).
 It runs Google Lighthouse on any public URL and returns, in one call:
 
-- **Lighthouse scores** for performance, accessibility, best practices and SEO
+- **Lighthouse scores** for performance, accessibility, best practices and SEO, plus agentic browsing
 - **Lab metrics** of the run: First Contentful Paint (FCP), Largest Contentful Paint (LCP),
   Total Blocking Time (TBT), Cumulative Layout Shift (CLS), Speed Index
 - **Every Lighthouse audit** with its score, display value and details
@@ -51,7 +51,7 @@ or give an AI agent or CLI a typed view of a page's performance.
 ## Features
 
 - **Full coverage of the API**: `runPagespeed` with every documented parameter
-  (`url`, `strategy`, `category`, `locale`, `utm_campaign`, `utm_source`)
+  (`url`, `strategy`, `category`, `locale`, `utm_campaign`, `utm_source`, `captchaToken`)
 - **Typed response** for scores, audits, run metadata and CrUX field data; unknown fields are
   ignored, so new fields from Google do not break parsing
 - **Summaries** of the numbers people check first: `category_score`, `page_field_summary`,
@@ -81,12 +81,11 @@ or give an AI agent or CLI a typed view of a page's performance.
 |-----------------|----------------|--------|
 | `url` | `RunPagespeedRequest::new(url)` | `http://` or `https://` URL |
 | `strategy` | `.strategy(Strategy)` | `Mobile` (default), `Desktop` |
-| `category` (repeated) | `.category(Category)`, `.categories(...)` | `Performance` (default), `Accessibility`, `BestPractices`, `Seo`, or `Category::ALL` |
+| `category` (repeated) | `.category(Category)`, `.categories(...)` | `Performance` (default), `Accessibility`, `BestPractices`, `Seo`, `AgenticBrowsing`, `Pwa`; `Category::ALL` is the first four |
 | `locale` | `.locale("ja")` | language of audit titles and descriptions |
 | `utm_campaign`, `utm_source` | `.utm_campaign(..)`, `.utm_source(..)` | free text |
+| `captchaToken` | `.captcha_token(..)` | token from solving a captcha |
 | `key` | `PageSpeedInsightsApi::with_api_key(key)` | API key |
-
-The deprecated `captchaToken` parameter is not supported.
 
 ## Prerequisites
 
@@ -270,6 +269,7 @@ match api.run_pagespeed(&RunPagespeedRequest::new("https://example.com/")).await
     Err(GoogleApiError::Connection(e)) => eprintln!("could not reach Google: {e}"),
     Err(GoogleApiError::JsonParse(e)) => eprintln!("unexpected response: {e}"),
     Err(GoogleApiError::InvalidArgument(e)) => eprintln!("bad input: {e}"),
+    Err(e) => eprintln!("{e}"), // the enum is non-exhaustive
 }
 # }
 ```
@@ -280,6 +280,10 @@ match api.run_pagespeed(&RunPagespeedRequest::new("https://example.com/")).await
 | `403` | invalid API key, or the API is not enabled for the project |
 | `429` | quota exhausted |
 | `500` | Lighthouse timed out or failed on Google's side; retrying usually works |
+
+`GoogleApiError::reason()` returns the machine-readable cause from the error body (for example
+`API_KEY_INVALID` or `RESOURCE_EXHAUSTED`), and `is_timeout()` tells whether the request timed out.
+`Connection` and `JsonParse` hold the underlying error, also available through `Error::source`.
 
 ## Quota and rate limits
 
@@ -313,6 +317,8 @@ prints the scores, the field and lab summaries, and the failing audits.
 cargo test                                          # mock server, no API key needed
 PAGESPEED_API_KEY=... cargo test --test live -- --ignored   # real API
 ```
+
+The mock responses are written by hand from the API reference.
 
 CI runs the mock tests on every push and the live tests weekly when the `PAGESPEED_API_KEY`
 secret is set, so changes in Google's response format are noticed.

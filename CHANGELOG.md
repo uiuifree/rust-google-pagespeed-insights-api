@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- `with_quota_project` sends `x-goog-user-project`, needed with user credentials from the gcloud CLI.
-
 ## [0.1.0]
 
 ### Added
@@ -21,4 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   field data for the URL and its origin.
 - `FieldSummary`, `LabSummary` and `LighthouseResult::failing_audits`.
 - Re-export of `reqwest` for `with_client`.
+- `with_quota_project` sends `x-goog-user-project`, needed with user credentials from the gcloud CLI.
+- `Category::AgenticBrowsing`, `Category::Pwa` and `RunPagespeedRequest::captcha_token`.
+- `GoogleApiError` with `status`, `reason`, `is_timeout` and `Error::source`. Public types are
+  `#[non_exhaustive]`.
 - Live tests against the real API (`tests/live.rs`, ignored by default) and a weekly CI run.

@@ -7,13 +7,13 @@ Crate name: `google-pagespeed-insights-api` (import as `google_pagespeed_insight
 Public items:
 
 - `PageSpeedInsightsApi::{new, with_api_key, with_access_token, with_quota_project, with_client, with_base_url}`; `run_pagespeed(&RunPagespeedRequest) -> Result<PagespeedResponse, GoogleApiError>`; `run_pagespeed_raw(..) -> Result<serde_json::Value, _>`
-- `RunPagespeedRequest::new(url)` with `.strategy(Strategy::{Mobile, Desktop})`, `.category(..)`, `.categories(Category::ALL)`, `.locale("en")`, `.utm_campaign(..)`, `.utm_source(..)`
-- `Category::{Performance, Accessibility, BestPractices, Seo}`; `Category::ALL`; `lighthouse_id()` gives `performance`, `best-practices`, ...
+- `RunPagespeedRequest::new(url)` with `.strategy(Strategy::{Mobile, Desktop})`, `.category(..)`, `.categories(Category::ALL)`, `.locale("en")`, `.utm_campaign(..)`, `.utm_source(..)`, `.captcha_token(..)`
+- `Category::{Performance, Accessibility, BestPractices, Seo, AgenticBrowsing, Pwa}`; `Category::ALL` (the first four); `lighthouse_id()` gives `performance`, `best-practices`, ...
 - `PagespeedResponse::{category_score, page_field_summary, origin_field_summary, lab_summary}`; fields `id`, `loading_experience`, `origin_loading_experience`, `lighthouse_result`
 - `LighthouseResult::{audit(id), category(Category), category_score, failing_audits(Category)}`; `audits: BTreeMap<String, LighthouseAudit>`
 - `FieldSummary { overall, origin_fallback, lcp, inp, cls, fcp, ttfb }` where each is `Option<FieldValue { p75, category }>`; CLS already divided by 100
 - `LabSummary { performance_score, fcp, lcp, tbt, cls, speed_index, server_response_time }` in milliseconds
-- `GoogleApiError::{Connection, JsonParse, HttpStatus(u16, String), InvalidArgument}`, `status()`
+- `GoogleApiError::{Connection, JsonParse, HttpStatus(u16, String), InvalidArgument}` (non-exhaustive), `status()`, `reason()`, `is_timeout()`
 
 All response types implement `Serialize`. Without a key the shared quota is often exhausted (429). Audit `details` are `serde_json::Value`. For CrUX history or origin queries without Lighthouse, use the `google-crux-api` crate.
 

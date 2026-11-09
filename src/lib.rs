@@ -194,19 +194,13 @@ impl PageSpeedInsightsApi {
         if let Some(project) = &self.quota_project {
             builder = builder.header("x-goog-user-project", project);
         }
-        let response = builder
-            .send()
-            .await
-            .map_err(|e| GoogleApiError::Connection(e.to_string()))?;
+        let response = builder.send().await.map_err(GoogleApiError::Connection)?;
         let status = response.status();
-        let body = response
-            .text()
-            .await
-            .map_err(|e| GoogleApiError::Connection(e.to_string()))?;
+        let body = response.text().await.map_err(GoogleApiError::Connection)?;
         if !status.is_success() {
             return Err(GoogleApiError::HttpStatus(status.as_u16(), body));
         }
-        serde_json::from_str(&body).map_err(|e| GoogleApiError::JsonParse(e.to_string()))
+        serde_json::from_str(&body).map_err(GoogleApiError::JsonParse)
     }
 }
 

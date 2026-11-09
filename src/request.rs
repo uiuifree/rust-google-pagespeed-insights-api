@@ -4,6 +4,7 @@ use std::fmt::{Display, Formatter};
 /// Device that Lighthouse emulates (`strategy` query parameter).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum Strategy {
     /// Mobile device with a throttled network. This is also the API default.
     #[default]
@@ -33,6 +34,7 @@ impl Display for Strategy {
 /// When no category is given the API runs only [`Category::Performance`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
 pub enum Category {
     /// Performance (lab metrics such as LCP, TBT and CLS).
     Performance,
@@ -42,10 +44,15 @@ pub enum Category {
     BestPractices,
     /// SEO (crawlability, meta tags, structured data basics).
     Seo,
+    /// Progressive Web App. Removed from Lighthouse 12, so current runs may not return it.
+    Pwa,
+    /// Agentic browsing: how well AI agents can use the page.
+    AgenticBrowsing,
 }
 
 impl Category {
-    /// All categories, in the order Lighthouse reports them.
+    /// The four standard categories, in the order Lighthouse reports them.
+    /// [`Category::Pwa`] and [`Category::AgenticBrowsing`] are not included.
     pub const ALL: [Category; 4] = [
         Category::Performance,
         Category::Accessibility,
@@ -60,6 +67,8 @@ impl Category {
             Category::Accessibility => "ACCESSIBILITY",
             Category::BestPractices => "BEST_PRACTICES",
             Category::Seo => "SEO",
+            Category::Pwa => "PWA",
+            Category::AgenticBrowsing => "AGENTIC_BROWSING",
         }
     }
 
@@ -70,6 +79,8 @@ impl Category {
             Category::Accessibility => "accessibility",
             Category::BestPractices => "best-practices",
             Category::Seo => "seo",
+            Category::Pwa => "pwa",
+            Category::AgenticBrowsing => "agentic-browsing",
         }
     }
 }
@@ -96,6 +107,7 @@ impl Display for Category {
 /// assert_eq!(request.get_strategy(), Strategy::Desktop);
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub struct RunPagespeedRequest {
     url: String,
     strategy: Strategy,
@@ -103,6 +115,7 @@ pub struct RunPagespeedRequest {
     locale: Option<String>,
     utm_campaign: Option<String>,
     utm_source: Option<String>,
+    captcha_token: Option<String>,
 }
 
 impl RunPagespeedRequest {
@@ -115,6 +128,7 @@ impl RunPagespeedRequest {
             locale: None,
             utm_campaign: None,
             utm_source: None,
+            captcha_token: None,
         }
     }
 
@@ -158,6 +172,12 @@ impl RunPagespeedRequest {
         self
     }
 
+    /// Sets the `captchaToken` parameter, the token from solving a captcha.
+    pub fn captcha_token<T: Into<String>>(mut self, value: T) -> Self {
+        self.captcha_token = Some(value.into());
+        self
+    }
+
     /// The URL to analyze.
     pub fn url(&self) -> &str {
         &self.url
@@ -189,6 +209,9 @@ impl RunPagespeedRequest {
         }
         if let Some(value) = &self.utm_source {
             pairs.push(("utm_source", value.clone()));
+        }
+        if let Some(value) = &self.captcha_token {
+            pairs.push(("captchaToken", value.clone()));
         }
         pairs
     }

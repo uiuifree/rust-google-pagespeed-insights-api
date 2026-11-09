@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 /// Built from a [`LoadingExperience`]. Times are in milliseconds and CLS is
 /// the plain score (for example `0.05`), already divided by 100.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct FieldSummary {
     /// The URL or origin the data belongs to.
     pub id: Option<String>,
@@ -31,6 +32,7 @@ pub struct FieldSummary {
 
 /// A field metric value and its assessment.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct FieldValue {
     /// 75th percentile.
     pub p75: f64,
@@ -89,6 +91,7 @@ impl FieldSummary {
 /// Times are in milliseconds. Each value is `None` when the audit is missing,
 /// for example when the performance category was not requested.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct LabSummary {
     /// Performance score from `0.0` to `1.0`.
     pub performance_score: Option<f64>,
