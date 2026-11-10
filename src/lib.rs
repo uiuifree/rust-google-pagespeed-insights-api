@@ -24,11 +24,22 @@ use serde_json::Value;
 
 const DEFAULT_BASE_URL: &str = "https://www.googleapis.com/pagespeedonline/v5";
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 enum Credential {
     None,
     ApiKey(String),
     AccessToken(String),
+}
+
+// Hand-written so that `{:?}` never prints the key or the token.
+impl std::fmt::Debug for Credential {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Credential::None => f.write_str("None"),
+            Credential::ApiKey(_) => f.write_str("ApiKey(<redacted>)"),
+            Credential::AccessToken(_) => f.write_str("AccessToken(<redacted>)"),
+        }
+    }
 }
 
 /// Client for the PageSpeed Insights API v5.
@@ -194,9 +205,16 @@ impl PageSpeedInsightsApi {
         if let Some(project) = &self.quota_project {
             builder = builder.header("x-goog-user-project", project);
         }
-        let response = builder.send().await.map_err(GoogleApiError::Connection)?;
+        // The URL carries the API key in its query, so it is removed from the error.
+        let response = builder
+            .send()
+            .await
+            .map_err(|e| GoogleApiError::Connection(e.without_url()))?;
         let status = response.status();
-        let body = response.text().await.map_err(GoogleApiError::Connection)?;
+        let body = response
+            .text()
+            .await
+            .map_err(|e| GoogleApiError::Connection(e.without_url()))?;
         if !status.is_success() {
             return Err(GoogleApiError::HttpStatus(status.as_u16(), body));
         }
@@ -229,6 +247,31 @@ mod tests {
             .build_url(&RunPagespeedRequest::new("https://example.com/"))
             .unwrap();
         assert!(!url.as_str().contains("secret"));
+    }
+
+    #[test]
+    fn debug_does_not_print_credentials() {
+        let key = format!("{:?}", PageSpeedInsightsApi::with_api_key("my-api-key"));
+        assert!(!key.contains("my-api-key"), "{key}");
+        assert!(key.contains("ApiKey(<redacted>)"), "{key}");
+
+        let token = format!("{:?}", PageSpeedInsightsApi::with_access_token("my-token"));
+        assert!(!token.contains("my-token"), "{token}");
+        assert!(token.contains("AccessToken(<redacted>)"), "{token}");
+    }
+
+    #[tokio::test]
+    async fn connection_error_does_not_print_api_key() {
+        // Nothing listens on port 1, so the request fails before any response.
+        let api =
+            PageSpeedInsightsApi::with_api_key("my-api-key").with_base_url("http://127.0.0.1:1");
+        let error = api
+            .run_pagespeed(&RunPagespeedRequest::new("https://example.com/"))
+            .await
+            .unwrap_err();
+        assert!(matches!(error, GoogleApiError::Connection(_)), "{error:?}");
+        assert!(!format!("{error}").contains("my-api-key"), "{error}");
+        assert!(!format!("{error:?}").contains("my-api-key"), "{error:?}");
     }
 
     #[test]

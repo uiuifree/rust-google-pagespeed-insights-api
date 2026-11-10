@@ -21,4 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Category::AgenticBrowsing`, `Category::Pwa` and `RunPagespeedRequest::captcha_token`.
 - `GoogleApiError` with `status`, `reason`, `is_timeout` and `Error::source`. Public types are
   `#[non_exhaustive]`.
+- API keys and access tokens are kept out of `Debug` output and out of connection error
+  messages.
 - Live tests against the real API (`tests/live.rs`, ignored by default) and a weekly CI run.
